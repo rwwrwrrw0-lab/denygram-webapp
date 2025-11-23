@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DenyTube 🎬 - Современная видео платформа</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff0000;
+            --primary-dark: #cc0000;
+            --secondary-color: #282828;
+            --background-color: #0f0f0f;
+            --surface-color: #212121;
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
+            --text-muted: #717171;
+            --sidebar-width: 240px;
+            --header-height: 56px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            --gradient: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--secondary-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            height: var(--header-height);
+            background-color: var(--background-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--secondary-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            color: var(--primary-color);
+            font-size: 28px;
+            font-weight: 900;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            flex: 0 1 728px;
+            margin: 0 40px;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 40px;
+            padding: 0 20px;
+            background-color: var(--surface-color);
+            border: 2px solid var(--secondary-color);
+            border-radius: 25px;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
+        }
+
+        .search-button {
+            height: 40px;
+            width: 64px;
+            background: var(--gradient);
+            border: none;
+            border-radius: 0 25px 25px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-left: -2px;
+            transition: var(--transition);
+        }
+
+        .search-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .server-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-online {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border: 1px solid #4CAF50;
+        }
+
+        .status-offline {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            transition: var(--transition);
+        }
+
+        .user-icon:hover {
+            transform: scale(1.1);
+        }
+
+        /* Setup Panel */
+        .setup-panel {
+            background: var(--surface-color);
+            padding: 30px;
+            border-radius: 16px;
+            margin: 20px 0;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .setup-panel h3 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .url-input-container {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 16px 20px;
+            background: var(--background-color);
+            border: 2px solid var(--secondary-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1);
+        }
+
+        .test-btn {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .instructions {
+            background: rgba(13, 71, 161, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid rgba(66, 133, 244, 0.3);
+        }
+
+        .instructions ol {
+            margin-left: 24px;
+            line-height: 1.8;
+        }
+
+        .instructions li {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            margin-top: var(--header-height);
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--header-height));
+            background-color: var(--background-color);
+            position: fixed;
+            overflow-y: auto;
+            padding: 20px 0;
+            z-index: 100;
+            border-right: 1px solid var(--secondary-color);
+        }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+
+        .sidebar-section-title {
+            padding: 0 24px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: 0 12px 12px 0;
+            margin-right: 12px;
+        }
+
+        .sidebar-item:hover {
+            background: var(--surface-color);
+        }
+
+        .sidebar-item.active {
+            background: var(--surface-color);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .sidebar-icon {
+            margin-right: 20px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-item.active .sidebar-icon {
+            color: var(--primary-color);
+        }
+
+        /* Content Styles */
+        .content {
+            margin-left: var(--sidebar-width);
+            padding: 24px;
+            width: calc(100% - var(--sidebar-width));
+            background: var(--background-color);
+        }
+
+        /* Navigation Tabs */
+        .content-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--secondary-color);
+            margin-bottom: 24px;
+            gap: 8px;
+        }
+
+        .content-tab {
+            padding: 16px 24px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient);
+            transition: var(--transition);
+            z-index: -1;
+        }
+
+        .content-tab:hover::before {
+            left: 0;
+        }
+
+        .content-tab:hover {
+            color: white;
+        }
+
+        .content-tab.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .content-tab.active::before {
+            left: 0;
+            opacity: 0.1;
+        }
+
+        /* Player Styles */
+        .player-section {
+            display: none;
+            margin-bottom: 32px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .player-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .video-player-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .video-placeholder {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        .player-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 24px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .video-player-container:hover .player-controls {
+            opacity: 1;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .control-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .left-controls, .right-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.1);
+            transform: scale(1.1);
+        }
+
+        .play-pause {
+            background: var(--gradient);
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .play-pause:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* Video Info Styles */
+        .video-info-section {
+            margin-top: 24px;
+            animation: slideUp 0.5s ease-in-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .video-title-large {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            line-height: 1.4;
+            color: var(--text-primary);
+        }
+
+        .video-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .views-count {
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface-color);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 12px 20px;
+            border-radius: 20px;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            background: var(--secondary-color);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.active {
+            color: var(--primary-color);
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        .channel-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: var(--surface-color);
+            border-radius: 16px;
+            transition: var(--transition);
+        }
+
+        .channel-info:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .channel-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .channel-details {
+            flex: 1;
+        }
+
+        .channel-name {
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-size: 18px;
+        }
+
+        .subscribers {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .subscribe-btn {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .subscribe-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .video-description {
+            background: var(--surface-color);
+            padding: 24px;
+            border-radius: 16px;
+            margin-top: 20px;
+            font-size: 15px;
+            line-height: 1.7;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--secondary-color);
+        }
+
+        /* Shorts Styles */
+        .shorts-container {
+            display: none;
+            max-width: 400px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .shorts-container.active {
+            display: block;
+        }
+
+        .short-video {
+            position: relative;
+            width: 100%;
+            height: 75vh;
+            max-height: 700px;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .short-video video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+        }
+
+        .short-controls {
+            position: absolute;
+            right: 20px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .short-control-btn {
+            background: none;
+            border: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .short-control-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .short-control-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+        }
+
+        .short-control-btn:hover .short-control-icon {
+            background: rgba(255, 0, 0, 0.8);
+        }
+
+        .short-control-count {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .short-info {
+            position: absolute;
+            bottom: 24px;
+            left: 20px;
+            right: 100px;
+        }
+
+        .short-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .short-stats {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .short-channel {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .short-channel-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .shorts-navigation {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .nav-btn {
+            background: var(--surface-color);
+            color: var(--text-primary);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: var(--gradient);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
+        }
+
+        /* Channel Page Styles */
+        .channel-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .channel-section.active {
+            display: block;
+        }
+
+        .channel-header {
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 32px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .channel-banner {
+            width: 100%;
+            height: 200px;
+            background: var(--gradient);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .channel-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 36px;
+            border: 4px solid var(--background-color);
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .channel-info-large {
+            margin-top: 60px;
+        }
+
+        .channel-name-large {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .channel-stats {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Recommendations Styles */
+        .recommendations-section {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .recommendations-section.hidden {
+            display: none;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .category-filters {
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+            gap: 12px;
+            scrollbar-width: none;
+        }
+
+        .category-filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-filter {
+            background-color: var(--surface-color);
+            border: 2px solid var(--secondary-color);
+            color: var(--text-secondary);
+            padding: 12px 20px;
+            border-radius: 20px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .category-filter:hover {
+            border-color: var(--primary-color);
+            color: var(--text-primary);
+        }
+
+        .category-filter.active {
+            background: var(--gradient);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .video-card {
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--surface-color);
+            box-shadow: var(--shadow);
+        }
+
+        .video-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .thumbnail {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background-color: var(--secondary-color);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .video-card:hover .thumbnail img {
+            transform: scale(1.05);
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .video-info {
+            display: flex;
+            gap: 12px;
+            padding: 0 12px 12px;
+        }
+
+        .channel-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .video-details {
+            flex: 1;
+        }
+
+        .video-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+
+        .channel-name-small {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .video-meta {
+            color: var(--text-muted);
+            font-size: 13px;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Loading and Error States */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        .error {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 18px;
+            color: #ff5555;
+            background: var(--surface-color);
+            border-radius: 16px;
+            margin: 20px 0;
+        }
+
+        .success-message {
+            background: var(--surface-color);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            border-left: 4px solid #4CAF50;
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .sidebar-item span {
+                display: none;
+            }
+            
+            .sidebar-section-title {
+                display: none;
+            }
+            
+            .content {
+                margin-left: 80px;
+                width: calc(100% - 80px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-container {
+                margin: 0 20px;
+            }
+            
+            .server-info {
+                display: none;
+            }
+            
+            .videos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            
+            .video-stats {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            
+            .control-buttons {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+            
+            .shorts-container {
+                max-width: 100%;
+            }
+            
+            .short-video {
+                height: 70vh;
+            }
+            
+            .channel-header {
+                padding: 24px;
+            }
+            
+            .channel-stats {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .content {
+                margin-left: 0;
+                width: 100%;
+                padding: 16px;
+            }
+            
+            .videos-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-tabs {
+                overflow-x: auto;
+                padding-bottom: 8px;
+            }
+            
+            .content-tab {
+                padding: 12px 16px;
+                white-space: nowrap;
+                font-size: 14px;
+            }
+            
+            .channel-avatar-large {
+                width: 80px;
+                height: 80px;
+                font-size: 24px;
+            }
+            
+            .channel-name-large {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <div class="logo"><i class="fas fa-play-circle"></i></div>
+            <div class="logo-text">DenyTube</div>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Поиск видео и каналов..." id="search-input">
+            <button class="search-button" id="search-button"><i class="fas fa-search"></i></button>
+        </div>
+        
+        <div class="server-info">
+            <div class="server-status status-offline" id="server-status">
+                <i class="fas fa-server"></i>
+                <span id="status-text">Backend Offline</span>
+            </div>
+        </div>
+        
+        <div class="user-actions">
+            <button class="action-btn" id="upload-btn">
+                <i class="fas fa-upload"></i>
+                <span>Загрузить</span>
+            </button>
+            <div class="user-icon">U</div>
+        </div>
+    </header>
+    
+    <div class="main-container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-item active" data-section="home">
+                    <div class="sidebar-icon"><i class="fas fa-home"></i></div>
+                    <span>Главная</span>
+                </div>
+                <div class="sidebar-item" data-section="shorts">
+                    <div class="sidebar-icon"><i class="fas fa-bolt"></i></div>
+                    <span>Shorts</span>
+                </div>
+                <div class="sidebar-item" data-section="subscriptions">
+                    <div class="sidebar-icon"><i class="fas fa-play-circle"></i></div>
+                    <span>Подписки</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Библиотека</div>
+                <div class="sidebar-item" data-section="history">
+                    <div class="sidebar-icon"><i class="fas fa-history"></i></div>
+                    <span>История</span>
+                </div>
+                <div class="sidebar-item" data-section="liked">
+                    <div class="sidebar-icon"><i class="fas fa-thumbs-up"></i></div>
+                    <span>Понравилось</span>
+                </div>
+                <div class="sidebar-item" data-section="playlists">
+                    <div class="sidebar-icon"><i class="fas fa-list"></i></div>
+                    <span>Плейлисты</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Категории</div>
+                <div class="sidebar-item" data-section="music">
+                    <div class="sidebar-icon"><i class="fas fa-music"></i></div>
+                    <span>Музыка</span>
+                </div>
+                <div class="sidebar-item" data-section="gaming">
+                    <div class="sidebar-icon"><i class="fas fa-gamepad"></i></div>
+                    <span>Игры</span>
+                </div>
+                <div class="sidebar-item" data-section="sports">
+                    <div class="sidebar-icon"><i class="fas fa-basketball-ball"></i></div>
+                    <span>Спорт</span>
+                </div>
+                <div class="sidebar-item" data-section="education">
+                    <div class="sidebar-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <span>Обучение</span>
+                </div>
+            </div>
+        </aside>
+        
+        <main class="content">
+            <!-- Setup Panel -->
+            <div class="setup-panel" id="setup-panel">
+                <h3><i class="fab fa-google"></i> Настройка DenyTube</h3>
+                <p>Подключите бекенд для полной функциональности или используйте демо-режим</p>
+                
+                <div class="url-input-container">
+                    <input type="text" class="url-input" id="backend-url" 
+                           placeholder="https://your-backend-url.com">
+                    <button class="test-btn" id="test-connection">
+                        <i class="fas fa-plug"></i> Подключить
+                    </button>
+                </div>
+                
+                <div class="instructions">
+                    <h4>🚀 Быстрый старт:</h4>
+                    <ol>
+                        <li>Запустите бекенд в Google Colab</li>
+                        <li>Скопируйте предоставленный URL</li>
+                        <li>Вставьте URL выше и нажмите "Подключить"</li>
+                        <li>Или используйте демо-режим для тестирования</li>
+                    </ol>
+                    <button class="test-btn" onclick="enableDemoMode()" 
+                            style="background: #ff9800; margin-top: 15px;">
+                        <i class="fas fa-play-circle"></i> Запустить демо-режим
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div id="main-content" style="display: none;">
+                <!-- Navigation Tabs -->
+                <div class="content-tabs">
+                    <button class="content-tab active" data-tab="videos">
+                        <i class="fas fa-play"></i> Видео
+                    </button>
+                    <button class="content-tab" data-tab="shorts">
+                        <i class="fas fa-bolt"></i> Shorts
+                    </button>
+                    <button class="content-tab" data-tab="channels">
+                        <i class="fas fa-users"></i> Каналы
+                    </button>
+                    <button class="content-tab" data-tab="upload">
+                        <i class="fas fa-upload"></i> Загрузить
+                    </button>
+                </div>
+
+                <!-- Video Player Section -->
+                <div class="player-section" id="player-section">
+                    <!-- Player content will be loaded here -->
+                </div>
+                
+                <!-- Shorts Section -->
+                <div class="shorts-container" id="shorts-container">
+                    <!-- Shorts content will be loaded here -->
+                </div>
+
+                <!-- Channels Section -->
+                <div class="channel-section" id="channels-section">
+                    <!-- Channels content will be loaded here -->
+                </div>
+
+                <!-- Upload Section -->
+                <div class="upload-section" id="upload-section" style="display: none;">
+                    <div class="success-message">
+                        <i class="fas fa-cloud-upload-alt"></i> Загрузка контента
+                    </div>
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <div style="font-size: 48px; color: var(--primary-color); margin-bottom: 20px;">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <h2 style="margin-bottom: 16px; color: var(--text-primary);">Загрузите ваш контент</h2>
+                        <p style="color: var(--text-secondary); margin-bottom: 30px;">
+                            Выберите видео файл для загрузки на платформу
+                        </p>
+                        <div style="background: var(--surface-color); padding: 40px; border-radius: 20px; border: 2px dashed var(--secondary-color);">
+                            <input type="file" id="video-upload" accept="video/*" style="display: none;">
+                            <label for="video-upload" class="test-btn" style="cursor: pointer; display: inline-block;">
+                                <i class="fas fa-video"></i> Выбрать видео
+                            </label>
+                            <p style="margin-top: 20px; color: var(--text-muted); font-size: 14px;">
+                                Поддерживаемые форматы: MP4, MOV, AVI (макс. 2GB)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recommendations Section -->
+                <div class="recommendations-section" id="recommendations-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-fire"></i> Рекомендуемые видео
+                    </h2>
+                    
+                    <div class="category-filters">
+                        <button class="category-filter active" data-category="all">Все</button>
+                        <button class="category-filter" data-category="music">Музыка</button>
+                        <button class="category-filter" data-category="gaming">Игры</button>
+                        <button class="category-filter" data-category="sports">Спорт</button>
+                        <button class="category-filter" data-category="education">Обучение</button>
+                        <button class="category-filter" data-category="comedy">Комедия</button>
+                        <button class="category-filter" data-category="news">Новости</button>
+                    </div>
+                    
+                    <div class="videos-grid" id="videos-container">
+                        <div class="loading" id="loading-message">
+                            <i class="fas fa-spinner fa-spin"></i> Загрузка видео...
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="error" id="error-message" style="display: none;">
+                    Ошибка загрузки контента.
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Здесь будет JavaScript код из предыдущего ответа
+        // с добавлением функциональности для нового дизайна
+        // (плеер, загрузка видео, страницы каналов и т.д.)
+    </script>
+</body>
+</html>
